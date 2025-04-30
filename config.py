@@ -1,16 +1,18 @@
 """Config reader for ts-cf-dns."""
 
 from pydantic_settings import BaseSettings
+from pydantic import field_validator, Field
+
 
 
 class Settings(BaseSettings):
     """Define the settings we need."""
-    TAILSCALE_API_KEY: [str] = "your_tailscale_api_key"  # required
-    TAILSCALE_TAILNET: [str] = "your_tailnet"  # required
-    CLOUDFLARE_API_KEY: [str] = "your_cloudflare_api_key"  # required if using cloudflare, duh
-    CLOUDFLARE_ZONE_ID: [str] = "your_cloudflare_zone_id"  # required if using cloudflare
-    CLOUDFLARE_EMAIL: [str] = "your_email"  # required if using cloudflare
-    DNS_DOMAIN: [str] = "example.com"  # Base domain for DNS records, required
+    TAILSCALE_API_KEY: str
+    TAILSCALE_TAILNET: str
+    TAILSCALE_IGNORE_HOSTNAMES: str | None = None
+    CLOUDFLARE_API_KEY: str
+    CLOUDFLARE_ZONE_ID: str
+    DNS_DOMAIN: str
 
     class Config:
         """Define our settings file."""
@@ -18,3 +20,10 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Process the ignore list string into a set for efficient lookup
+TAILSCALE_IGNORED_HOSTNAMES_SET: set[str] = set()
+if settings.TAILSCALE_IGNORE_HOSTNAMES:
+    TAILSCALE_IGNORED_HOSTNAMES_SET = {
+        name.strip() for name in settings.TAILSCALE_IGNORE_HOSTNAMES.split(',') if name.strip()
+    }

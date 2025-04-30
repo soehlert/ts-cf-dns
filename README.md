@@ -26,7 +26,7 @@ without [rfc6724-update](https://datatracker.ietf.org/doc/draft-ietf-6man-rfc672
 
 ## Configuration
 
-Set the following variables in a file called .env at the root of this directory:
+Set the following variables in a file called .env at the root of this directory (NOTE: No need for quotes around the values in .env):
 
 `TAILSCALE_API_KEY:` Your Tailscale API key. - Required
 
@@ -37,6 +37,8 @@ Set the following variables in a file called .env at the root of this directory:
 `CLOUDFLARE_ZONE_ID:` Your Cloudflare zone ID. - Required if using cloudflare
 
 `DNS_DOMAIN:` Your domain name. - Required
+
+Make sure to use an [Account API Token](https://developers.cloudflare.com/fundamentals/api/get-started/account-owned-tokens/) from Cloudflare if you want to push to Cloudflare.
 
 ## Usage
 
