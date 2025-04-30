@@ -1,27 +1,14 @@
 #!/usr/bin/env python3
-# Script to grab the ULA IPv6 addresses from TailScale and shove them into other systems
-# such as cloudflare using the API, bind, or pihole.
-# It should be noted that putting ULA (or any private addressing) into public DNS is stupid
-# The downsides of which are well traveled, well studued, and generally just stupid.
-# This only supports IPv6 because there is no reason to support legacy IPv4 when everything on the tailnet  
-# has a valid IPv6 address, and when dual-stacked the IPv6 ULA will never be used (without rfc6724-update)
 
 import requests
-import json
 import argparse
 
-# Configuration
-TAILSCALE_API_KEY = "your_tailscale_api_key" # required
-TAILSCALE_TAILNET = "your_tailnet" # required
-CLOUDFLARE_API_KEY = "your_cloudflare_api_key" # required if using cloudflare, duh
-CLOUDFLARE_ZONE_ID = "your_cloudflare_zone_id" # required if using cloudflare
-CLOUDFLARE_EMAIL = "your_email" # required if using cloudflare
-DNS_DOMAIN = "example.com"  # Base domain for DNS records, required
+from config import settings
 
 def get_tailscale_ips():
-    url = f"https://api.tailscale.com/api/v2/tailnet/{TAILSCALE_TAILNET}/devices"
+    url = f"https://api.tailscale.com/api/v2/tailnet/{settings.TAILSCALE_TAILNET}/devices"
     headers = {
-        "Authorization": f"Basic {TAILSCALE_API_KEY}",
+        "Authorization": f"Basic {settings.TAILSCALE_API_KEY}",
         "Content-Type": "application/json"
     }
     response = requests.get(url, headers=headers)
@@ -35,10 +22,10 @@ def get_tailscale_ips():
     return {host: ip for host, ip in ipv6_addresses.items() if ip is not None}
 
 def update_cloudflare_dns(hostname, ipv6):
-    dns_name = f"{hostname}.{DNS_DOMAIN}"
-    url = f"https://api.cloudflare.com/client/v4/zones/{CLOUDFLARE_ZONE_ID}/dns_records"
+    dns_name = f"{hostname}.{settings.DNS_DOMAIN}"
+    url = f"https://api.cloudflare.com/client/v4/zones/{settings.CLOUDFLARE_ZONE_ID}/dns_records"
     headers = {
-        "Authorization": f"Bearer {CLOUDFLARE_API_KEY}",
+        "Authorization": f"Bearer {settings.CLOUDFLARE_API_KEY}",
         "Content-Type": "application/json"
     }
     
@@ -61,7 +48,7 @@ def format_bind(ipv6_records):
     return "\n".join(f"{hostname}. IN AAAA {ipv6}" for hostname, ipv6 in ipv6_records.items())
 
 def format_pihole(ipv6_records):
-    return "\n".join(f"{ipv6} {hostname}.{DNS_DOMAIN}" for hostname, ipv6 in ipv6_records.items())
+    return "\n".join(f"{ipv6} {hostname}.{settings.DNS_DOMAIN}" for hostname, ipv6 in ipv6_records.items())
 
 def main():
     parser = argparse.ArgumentParser(description="Tailscale to Cloudflare DNS Updater")

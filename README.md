@@ -26,7 +26,7 @@ without [rfc6724-update](https://datatracker.ietf.org/doc/draft-ietf-6man-rfc672
 
 ## Configuration
 
-Set the following variables in the script:
+Set the following variables in a file called .env at the root of this directory:
 
 `TAILSCALE_API_KEY:` Your Tailscale API key. - Required
 
