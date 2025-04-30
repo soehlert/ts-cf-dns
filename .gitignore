@@ -1,4 +1,3 @@
-.ideal/
 .env
 ts_cf_dns.egg-info
 uv.lock
